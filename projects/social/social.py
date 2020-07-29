@@ -1,4 +1,6 @@
 import random
+import sys
+sys.path.insert(1, '../graph/graph.py')
 
 class User:
     def __init__(self, name):
@@ -83,6 +85,10 @@ class SocialGraph:
         """
         visited = {}  # Note that this is a dictionary, not a set
         # !!!! IMPLEMENT ME
+        path = {}
+        self.users = {}
+        self.friendships = {}
+
         return visited
 
 
@@ -90,5 +96,7 @@ if __name__ == '__main__':
     sg = SocialGraph()
     sg.populate_graph(10, 2)
     print(sg.friendships)
+    print(Graph)
+
     # connections = sg.get_all_social_paths(1)
     # print(connections)
