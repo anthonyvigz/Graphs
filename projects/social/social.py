@@ -1,6 +1,6 @@
 import random
 import sys
-sys.path.insert(1, '../graph/graph.py')
+from queue import Queue
 
 class User:
     def __init__(self, name):
@@ -85,18 +85,28 @@ class SocialGraph:
         """
         visited = {}  # Note that this is a dictionary, not a set
         # !!!! IMPLEMENT ME
-        path = {}
-        self.users = {}
-        self.friendships = {}
+        paths = Queue([user_id])
+
+        while paths.size() > 0:
+            path = paths.dequeue()
+            # Find last vertex in path
+            curr_friend = path[-1]
+            # check if visited
+            print(curr_friend)
+            if curr_friend not in visited:
+                # Add to visited
+                visited[curr_friend] = path
+
+                for friend_id in self.friendships[curr_friend]:
+                    new_path = list(path)
+                    new_path.append(friend_id)
+                    paths.enqueue(new_path)
 
         return visited
-
 
 if __name__ == '__main__':
     sg = SocialGraph()
     sg.populate_graph(10, 2)
     print(sg.friendships)
-    print(Graph)
-
-    # connections = sg.get_all_social_paths(1)
-    # print(connections)
+    connections = sg.get_all_social_paths(1)
+    print(connections)
