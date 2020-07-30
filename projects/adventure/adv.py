@@ -2,6 +2,8 @@ from room import Room
 from player import Player
 from world import World
 
+from util import Stack, Queue 
+
 import random
 from ast import literal_eval
 
@@ -29,6 +31,68 @@ player = Player(world.starting_room)
 # traversal_path = ['n', 'n']
 traversal_path = []
 
+##### THE TRAVERSAL PATH #####
+
+# We start with zero and make that our initial graph
+# After one movement, we update the graph by updating nodes with that connected edges
+# Keep going until current node as no question marks
+# THEN traverse until a node is found with question marks and continue in that direction
+
+class Graph:
+
+    def __init__(self):
+        self.rooms = {}
+        self.traversal_path = []
+        self.travelled_from = None
+        self.last_room = None
+
+    def add_room(self, room):
+        """
+        Add a room to the graph.
+        """
+        self.rooms[room] = {}
+
+        for exit in player.current_room.get_exits():
+            self.rooms[room][exit] = '?'
+
+        if self.travelled_from is not None:
+            if self.traveled_from  == 'n':
+                self.rooms[room]['s'] == self.last_room
+            elif self.traveled_from  == 's':
+                self.rooms[room]['n'] == self.last_room
+            elif self.traveled_from  == 'e':
+                self.rooms[room]['w'] == self.last_room
+            else:
+                self.rooms[room]['e'] == self.last_room
+            
+
+
+        return self.rooms[room]
+
+    def travel(self, starting_room):
+        # this adds the first room
+        current_room = self.add_room(starting_room)
+
+        q = Queue()
+        q.enqueue(starting_room)
+
+        visited = []
+
+        while q.size() > 0:
+
+
+
+    def bft(self, starting_room):
+        q = Queue()
+        q.enqueue(starting_room)
+
+    def add_edge(self, v1, v2):
+        """
+        Add a directed edge to the graph.
+        """
+        if self.vertices.get(v1) == None or self.vertices.get(v2) == None:
+            raise IndexError(f"{v1} is not in the graph, bruh. try running add_vertex({v1} first.) ")
+        self.vertices[v1].add(v2)
 
 
 # TRAVERSAL TEST
