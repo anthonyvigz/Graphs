@@ -46,54 +46,69 @@ class Graph:
         self.travelled_from = None
         self.last_room = None
 
-    def add_room(self, room):
+    def add_room(self, room_id):
         """
         Add a room to the graph.
         """
-        self.rooms[room] = {}
 
-        for exit in player.current_room.get_exits():
-            self.rooms[room][exit] = '?'
+        # Only adds a room if it has not been marked yet
+        if room_id not in self.rooms:
+            self.rooms[room_id] = {}
 
-        if self.travelled_from is not None:
-            if self.traveled_from  == 'n':
-                self.rooms[room]['s'] == self.last_room
-            elif self.traveled_from  == 's':
-                self.rooms[room]['n'] == self.last_room
-            elif self.traveled_from  == 'e':
-                self.rooms[room]['w'] == self.last_room
-            else:
-                self.rooms[room]['e'] == self.last_room
-            
+            # defaults every exit to ?
+            for exit in player.current_room.get_exits():
+                self.rooms[room_id][exit] = '?'
 
+            # checks the last room we came from to make connection
+            if self.travelled_from is not None:
+                if self.traveled_from  == 'n':
+                    self.rooms[room_id]['s'] == self.last_room
+                elif self.traveled_from  == 's':
+                    self.rooms[room_id]['n'] == self.last_room
+                elif self.traveled_from  == 'e':
+                    self.rooms[room_id]['w'] == self.last_room
+                else:
+                    self.rooms[room_id]['e'] == self.last_room
 
-        return self.rooms[room]
+        # returns the whole room and exits
+        return self.rooms[room_id]
 
-    def travel(self, starting_room):
-        # this adds the first room
-        current_room = self.add_room(starting_room)
+    def travel(self):
+        # this adds the current room
+        current_room = self.add_room(player.current_room.id)
 
-        q = Queue()
-        q.enqueue(starting_room)
+        # travels as long as the current room has a question mark in any direction
+        if '?' in current_room.values():
+            for direction, value in current_room.items():
+                # the first mystery direction is followed, we travel, updated where we came from, and add to path
+                # we then travel again from the new room
+                if value is '?':
+                    player.travel(direction)
+                    self.travelled_from = direction
+                    self.last_room = current_room
+                    self.traversal_path.append(direction)
+                    self.travel()
+                    break
 
-        visited = []
+        # this is when we must traverse to find a new starting room
+        # every direction has been found or one doesn't exist
+        # no mystery directions
+        elif '?' not in current_room.values():
 
-        while q.size() > 0:
-
+            # implement BFT to find first room with a question mark
+            self.bft(current_room)
 
 
     def bft(self, starting_room):
+        start =
         q = Queue()
-        q.enqueue(starting_room)
+        q.enqueue(start)
 
-    def add_edge(self, v1, v2):
-        """
-        Add a directed edge to the graph.
-        """
-        if self.vertices.get(v1) == None or self.vertices.get(v2) == None:
-            raise IndexError(f"{v1} is not in the graph, bruh. try running add_vertex({v1} first.) ")
-        self.vertices[v1].add(v2)
+            visited = []
 
+            while q.size() > 0:
+                current_room = q.dequeue()
+                visited.append(current_room)
 
 # TRAVERSAL TEST
 visited_rooms = set()
