@@ -116,33 +116,42 @@ class Graph:
         # no mystery directions
         elif '?' not in current_room.values():
 
-            # implement BFT to find first room with a question mark
+            # implement BFS to find first room with a question mark
             if self.completed == False:
-                self.bfs(player.current_room.id)
+                self.bfs_dfs(player.current_room.id)
 
         return self.traversal_path
 
-    def bfs(self, starting_room):
+    def bfs_dfs(self, starting_room):
+        # bfs
         q = Queue()
         q.enqueue([starting_room])
 
+        # dfs
+        s = Stack()
+        s.push([starting_room])
+
         # track visited rooms
-        visited = []
+        q_visited = []
+        s_visited = []
 
         # look for shortest path to next ? room
 
-        while q.size() > 0 and self.completed == False:
+        while (q.size() > 0 or s.size() > 0) and self.completed == False:
             # List of the current rooms in path
-            path = q.dequeue()
+            q_path = q.dequeue()
+            s_path = s.pop()
 
             # room at end of path
-            id = path[-1]
+            q_id = q_path[-1]
+            s_id = s_path[-1]
 
             # we are done searching if there is a '?' in the values
             # and it's the shortest path found
-            if '?' in self.rooms[id].values():
+            if '?' in self.rooms[q_id].values():
                 # our shortest path is declared
-                roomsTraverse = path
+                print("using q path")
+                roomsTraverse = q_path
                 directions = []
                 # for every room in the shortest path, find the directional
                 # path
@@ -177,21 +186,71 @@ class Graph:
                 self.travelled_from = directions[-1]
                 self.travel()
                 break
+
+            elif '?' in self.rooms[s_id].values():
+                print("using s path")
+                # our shortest path is declared
+                roomsTraverse = s_path
+                directions = []
+                # for every room in the shortest path, find the directional
+                # path
+                for i in range(len(roomsTraverse)):
+                    if i < (len(roomsTraverse) - 1):
+                        next = self.rooms[roomsTraverse[i + 1]]
+                        for direction, room in next.items():
+                            # where the value of the next room appears in the current room
+                            # make the connection and direct
+                            if room == roomsTraverse[i]:
+                                # right now appending direction of next room but need previous room
+                                direct = None
+                                if direction == 'n':
+                                    direct = 's'
+                                elif direction == 's':
+                                    direct = 'n'
+                                elif direction == 'w':
+                                    direct = 'e'
+                                else:
+                                    direct = 'w'
+                                directions.append(direct)
+                    # once it gets to final room of current path
+                    # stop appending, that's our new start
+                    else:
+                        pass
+                # use the directions to get to room with ?
+                # and add to main traversal path
+                for direction in directions:
+                    self.traversal_path.append(direction)
+                    player.travel(direction)
+
+                self.travelled_from = directions[-1]
+                self.travel()
+                break
+
             else:
                 # check the room for neighbors unvisited and travel
                 # loop through curr
-                if id not in visited:
-                    visited.append(id)
+                if q_id not in q_visited:
+                    q_visited.append(q_id)
 
-                    for room_id in self.rooms[id].values():
+                    for room_id in self.rooms[q_id].values():
                         # Copy the path
-                        path_copy = list(path)
+                        path_copy = list(q_path)
                         path_copy.append(room_id)
                         # enqueue the neighbors we haven't visited
                         q.enqueue(path_copy)
 
+                if s_id not in s_visited:
+                    s_visited.append(s_id)
+
+                    for room_id in self.rooms[s_id].values():
+                        # Copy the path
+                        path_copy = list(s_path)
+                        path_copy.append(room_id)
+                        # enqueue the neighbors we haven't visited
+                        s.push(path_copy)
+
                  # checks if all rooms visited
-                if len(visited) == self.final_length:
+                if (len(q_visited) == self.final_length) or (len(s_visited) == self.final_length):
                     print("all rooms visited")
                     print(self.traversal_path)
                     self.completed = True
