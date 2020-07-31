@@ -94,7 +94,14 @@ class Graph:
 
         # travels as long as the current room has a question mark in any direction
         if '?' in current_room.values():
-            for direction, value in current_room.items():
+            preShuffle = current_room
+            keys = list(current_room.keys())
+            random.shuffle(keys)
+            Shuffled = dict()
+            for key in keys:
+                Shuffled.update({key: preShuffle[key]})
+
+            for direction, value in Shuffled.items():
                 # the first mystery direction is followed, we travel, updated where we came from, and add to path
                 # we then travel again from the new room
                 if value == '?':
