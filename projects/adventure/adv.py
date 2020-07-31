@@ -144,8 +144,6 @@ class Graph:
                 # our shortest path is declared
                 roomsTraverse = path
                 directions = []
-                if player.current_room.id == 163:
-                    print(self.rooms[id].values(), "id:", id)
                 # for every room in the shortest path, find the directional
                 # path
                 for i in range(len(roomsTraverse)):
