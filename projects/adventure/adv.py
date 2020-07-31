@@ -46,7 +46,7 @@ class Graph:
         self.traversal_path = []
         self.travelled_from = None
         self.last_room = None
-        self.current_room_id = None
+        self.current_room_id = room_id
 
     def add_room(self, room_id):
         """
@@ -87,6 +87,7 @@ class Graph:
     def travel(self):
         # this adds the current room
         current_room = self.add_room(player.current_room.id)
+        self.last_room = player.current_room.id
 
         # travels as long as the current room has a question mark in any direction
         if '?' in current_room.values():
@@ -96,7 +97,6 @@ class Graph:
                 if value is '?':
                     player.travel(direction)
                     self.travelled_from = direction
-                    self.last_room = current_room
                     self.traversal_path.append(direction)
                     self.travel()
                     break
@@ -107,11 +107,11 @@ class Graph:
         elif '?' not in current_room.values():
 
             # implement BFT to find first room with a question mark
-            self.bft(self.current_room_id)
+            self.bft(player.current_room.id)
 
     def bfs(self, starting_room):
         q = Queue()
-        q.enqueue(start)
+        q.enqueue(starting_room)
 
         # track visited rooms
         visited = []
@@ -133,20 +133,25 @@ class Graph:
                 directions = []
                 # for every room in the shortest path, find the directional
                 # path
-                for i in roomsTraverse:
-                    next = self.rooms[roomsTraverse[i + 1]]
-                    for direction, room in next.items():
-                        if room == roomsTraverse[i]:
-                            directions.append(direction)
+                for i in range(len(roomsTraverse)):
+                    if i < (len(roomsTraverse) - 1):
+                        next = self.rooms[roomsTraverse[i + 1]]
+                        for direction, room in next.items():
+                            if room == roomsTraverse[i]:
+                                directions.append(direction)
+                    # once it gets to final room of current path
+                    # stop appending, that's our new start
+                    else:
+                        pass
 
-                for direction, value in self.rooms[id].items():
-                    if value is '?':
-                        player.travel(direction)
-                        self.travelled_from = direction
-                        self.last_room = current_room
-                        self.traversal_path.append(direction)
-                        self.travel()
-                        break
+                # use the directions to get to room with ?
+                # and add to main traversal path
+                for direction in directions:
+                    self.traversal_path.append(direction)
+                    player.travel(direction)
+
+                self.travelled_from = player.current_room.id
+                self.travel()
 
             else:
                 # check the room for neighbors unvisited and travel

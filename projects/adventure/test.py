@@ -1,7 +1,4 @@
-rooms = {
-  0: {'n': '?', 's': '?', 'w': '?', 'e': '?'}
-}
+roomsTraverse = [6, 0]
 
-current_room = rooms[0]
 
-print(current_room)
+print(len(roomsTraverse))
