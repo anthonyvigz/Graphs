@@ -1,4 +1,5 @@
-roomsTraverse = [6, 0]
+rooms = {0: {'n': '?', 's': '?', 'w': '?', 'e': '?'},
+         1: {'n': '?', 's': '?'}, 2: {'s': '?'}}
 
-
-print(len(roomsTraverse))
+if 2 not in rooms:
+    print('hey')
