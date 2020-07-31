@@ -55,27 +55,25 @@ class Graph:
         # Only adds a room if it has not been marked yet
         if room_id not in self.rooms:
             self.rooms[room_id] = {}
-            print("adding room", room_id)
 
             # defaults every exit to ?
             for exit in player.current_room.get_exits():
                 self.rooms[room_id][exit] = '?'
 
-            # checks the last room we came from to make connection
-            print(self.travelled_from)
-            if self.travelled_from is not None:
-                if self.travelled_from == 'n':
-                    self.rooms[room_id]['s'] = self.last_room
-                    self.rooms[self.last_room]['n'] = room_id
-                elif self.travelled_from == 's':
-                    self.rooms[room_id]['n'] = self.last_room
-                    self.rooms[self.last_room]['s'] = room_id
-                elif self.travelled_from == 'e':
-                    self.rooms[room_id]['w'] = self.last_room
-                    self.rooms[self.last_room]['e'] = room_id
-                else:
-                    self.rooms[room_id]['e'] = self.last_room
-                    self.rooms[self.last_room]['w'] = room_id
+        # checks the last room we came from to make connection
+        if self.travelled_from is not None:
+            if self.travelled_from == 'n' and self.rooms[room_id]['s'] == '?':
+                self.rooms[room_id]['s'] = self.last_room
+                self.rooms[self.last_room]['n'] = room_id
+            elif self.travelled_from == 's' and self.rooms[room_id]['n'] == '?':
+                self.rooms[room_id]['n'] = self.last_room
+                self.rooms[self.last_room]['s'] = room_id
+            elif self.travelled_from == 'e' and self.rooms[room_id]['w'] == '?':
+                self.rooms[room_id]['w'] = self.last_room
+                self.rooms[self.last_room]['e'] = room_id
+            elif self.travelled_from == 'w' and self.rooms[room_id]['e'] == '?':
+                self.rooms[room_id]['e'] = self.last_room
+                self.rooms[self.last_room]['w'] = room_id
 
         # returns the whole room and exits
         return self.rooms[room_id]
@@ -96,7 +94,6 @@ class Graph:
 
         # travels as long as the current room has a question mark in any direction
         if '?' in current_room.values():
-            print(self.rooms)
             for direction, value in current_room.items():
                 # the first mystery direction is followed, we travel, updated where we came from, and add to path
                 # we then travel again from the new room
@@ -111,8 +108,6 @@ class Graph:
         # every direction has been found or one doesn't exist
         # no mystery directions
         elif '?' not in current_room.values():
-            print(self.rooms)
-            print("searching for a new mystery room")
 
             # implement BFT to find first room with a question mark
             if self.completed == False:
@@ -132,7 +127,6 @@ class Graph:
         while q.size() > 0 and self.completed == False:
             # List of the current rooms in path
             path = q.dequeue()
-            print("path:", path)
 
             # room at end of path
             id = path[-1]
@@ -143,7 +137,8 @@ class Graph:
                 # our shortest path is declared
                 roomsTraverse = path
                 directions = []
-                print("checking room:", self.rooms[id])
+                if player.current_room.id == 163:
+                    print(self.rooms[id].values(), "id:", id)
                 # for every room in the shortest path, find the directional
                 # path
                 for i in range(len(roomsTraverse)):
@@ -168,23 +163,20 @@ class Graph:
                     # stop appending, that's our new start
                     else:
                         pass
-                print("directions:", directions)
                 # use the directions to get to room with ?
                 # and add to main traversal path
                 for direction in directions:
                     self.traversal_path.append(direction)
                     player.travel(direction)
 
-                self.travelled_from = player.current_room.id
-                print("gonna travel from:", self.travelled_from)
+                self.travelled_from = directions[-1]
                 self.travel()
-
+                break
             else:
                 # check the room for neighbors unvisited and travel
                 # loop through curr
                 if id not in visited:
                     visited.append(id)
-                    print("visited", visited)
 
                     for room_id in self.rooms[id].values():
                         # Copy the path
@@ -199,16 +191,11 @@ class Graph:
                     print(self.traversal_path)
                     self.completed = True
 
-        if self.completed == True:
-            print('exiting')
-            self.travel()
-
 
 # Fill this out with directions to walk
 # traversal_path = ['n', 'n']
 g = Graph(room_graph)
 traversal_path = g.travel()
-print(traversal_path)
 
 
 # TRAVERSAL TEST
