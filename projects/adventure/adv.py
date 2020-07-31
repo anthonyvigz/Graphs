@@ -13,10 +13,10 @@ world = World()
 
 # You may uncomment the smaller graphs for development and testing purposes.
 # map_file = "maps/test_line.txt"
-map_file = "maps/test_cross.txt"
+# map_file = "maps/test_cross.txt"
 # map_file = "maps/test_loop.txt"
 # map_file = "maps/test_loop_fork.txt"
-# map_file = "maps/main_maze.txt"
+map_file = "maps/main_maze.txt"
 
 # Loads the map into a dictionary
 room_graph = literal_eval(open(map_file, "r").read())
@@ -115,7 +115,10 @@ class Graph:
             print("searching for a new mystery room")
 
             # implement BFT to find first room with a question mark
-            self.bfs(player.current_room.id)
+            if self.completed == False:
+                self.bfs(player.current_room.id)
+
+        return self.traversal_path
 
     def bfs(self, starting_room):
         q = Queue()
@@ -195,6 +198,10 @@ class Graph:
                     print("all rooms visited")
                     print(self.traversal_path)
                     self.completed = True
+
+        if self.completed == True:
+            print('exiting')
+            self.travel()
 
 
 # Fill this out with directions to walk
